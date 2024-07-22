@@ -147,6 +147,7 @@ static vector<int> cipolla_power_mod_p(vector<int>& term, int b, int fieldextens
 }
 
 int squareroot(int n, int p) {
+    n = (n+p) % p;
     if (power_mod_p(n, int((p-1)/2), p) != 1) {
         cout << "No square root exists" << endl;
         cout << "n = " << n << ", p = " << p << endl;
@@ -270,4 +271,16 @@ int get_value_from_file(int prime, int repline, int b, ifstream &file) {
         ++current_line;
     }
     return -1;
+}
+
+long largenummodp(vector<long>& digits, int prime) {
+    long res = 0;
+    int len = digits.size();
+    for (int i=0; i < len; i++) {
+        int temp = digits[i] % prime;
+        int pow10 = power_mod_p(10, 4*i, prime);
+        temp = (temp * pow10) % prime;
+        res = (res + temp) % prime;
+    }
+    return res;
 }

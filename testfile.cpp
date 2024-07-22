@@ -22,17 +22,23 @@ void testSquareRoot(int n, int p) {
     cout << "Square root of " << n << " mod " << p << " is " << result << endl;
 }
 
-void testCSVReader() {
+/*void testCSVReader() {
     string filename = "classdata/file_13.csv";
     ifstream file(filename);
     string line;
     int repline = 3;
     int b = 0;
     get_value_from_file(13, repline, b, filename);
-}
+}*/
 
+void testLargeNumModP() {
+    vector<long> n = {1112, 9101, 5678, 123}; //written in reverse order
+    int p = 13;
+    cout << "Mod " << p << " is " << largenummodp(n, p) << endl;
+
+}
 // Main function
 int main(int argc, char *argv[]) {
-    testCSVReader();
+    testLargeNumModP();
     return 0;
 }

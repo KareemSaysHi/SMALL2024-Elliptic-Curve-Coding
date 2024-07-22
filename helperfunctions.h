@@ -30,3 +30,5 @@ int getAp(int p, int A, int B);
 
 // Function to get value from a CSV file
 int get_value_from_file(int prime, int repline, int b, ifstream &file);
+
+long largenummodp(vector<long>& digits, int prime);
