@@ -6,7 +6,6 @@
 #include <string>
 #include <sstream>
 
-
 using namespace std;
 
 // Function to calculate a^b mod p without overflow
@@ -188,6 +187,8 @@ int getAp(int p, int A, int B) {
 
     string filename = "classdata/file_" + to_string(p) + ".csv";
 
+    ifstream file;
+    file.open(filename);
     //step 1: figure out what residue class A is in
     for (int i = 0; i <= reps.size(); i++) {
         if (reps[i] == 0) {
@@ -209,7 +210,9 @@ int getAp(int p, int A, int B) {
     }
 
     if (c == 0) {
-        int readThing = get_value_from_file(p, repline, B, filename);
+        int readThing = get_value_from_file(p, repline, B, file);
+
+        file.close();
         return readThing;
     }
 
@@ -223,7 +226,9 @@ int getAp(int p, int A, int B) {
     //step 3: calculate B and lookup
     B = B * inverse(lsixth, p) % p;
 
-    int readThing = get_value_from_file(p, repline, B, filename);
+    int readThing = get_value_from_file(p, repline, B, file);
+
+    file.close();
     return readThing;
 
 }
@@ -232,17 +237,15 @@ int getAp(int p, int A, int B) {
 
 
 // Function to get value from a CSV file
-int get_value_from_file(int prime, int repline, int b, const std::string &filename) {
-    ifstream file(filename);
-    if (!file.is_open()) {
-        cout << "Unable to open file: " << filename << endl;
-        return -1;
-    }
+int get_value_from_file(int prime, int repline, int b, ifstream &file) {
 
     string line;
     int target_line = prime * repline + b + 1; //+1 to account for header
     int current_line = 0;
     
+    file.clear();           // Clear any error flags
+    file.seekg(0, std::ios::beg); // Move the file pointer to the beginning
+
     while (getline(file, line)) {
         if (current_line == target_line) {
             stringstream ss(line);

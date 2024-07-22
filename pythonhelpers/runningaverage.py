@@ -7,7 +7,7 @@ x_new = []
 y_new = []
 sumofdata = 0
 count = 0
-with open('datat3.txt', 'r') as file:
+with open('data.txt', 'r') as file:
     for line in file:
         data = line.strip().split(',')
         count += 1

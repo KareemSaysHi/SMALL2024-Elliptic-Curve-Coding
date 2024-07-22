@@ -29,4 +29,4 @@ vector<int> generate_primes_in_range(int lower, int upper);
 int getAp(int p, int A, int B);
 
 // Function to get value from a CSV file
-int get_value_from_file(int prime, int repline, int b, const std::string &filename);
+int get_value_from_file(int prime, int repline, int b, ifstream &file);
