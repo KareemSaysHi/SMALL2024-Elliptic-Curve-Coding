@@ -19,7 +19,7 @@ long power_mod_p(long a, int b, int p) {
         b = b >> 1;
         a = (a * a) % p;
     }
-    return result % p;
+    return ((result % p) + p ) % p;
 }
 
 // Function to calculate Legendre symbol
@@ -147,7 +147,7 @@ static vector<int> cipolla_power_mod_p(vector<int>& term, int b, int fieldextens
 }
 
 int squareroot(int n, int p) {
-    n = (n+p) % p;
+    n = ((n % p)+p) % p;
     if (power_mod_p(n, int((p-1)/2), p) != 1) {
         cout << "No square root exists" << endl;
         cout << "n = " << n << ", p = " << p << endl;
@@ -162,7 +162,7 @@ int squareroot(int n, int p) {
         int a = 0;
         int thingToEvaluate = 0;
         for (int i = 1; i < p; i++) {
-            thingToEvaluate = (power_mod_p(i, 2, p) - n) % p;
+            thingToEvaluate = (((power_mod_p(i, 2, p) - n) % p) + p) % p;
             if (power_mod_p(thingToEvaluate, int((p-1)/2), p) == p-1) { //NOT -1
                 a = i;
                 break;
@@ -170,12 +170,11 @@ int squareroot(int n, int p) {
         }
         //step 2: compute thing in cipolla
         //we are adjoining a square root of a^2 - n, so we need to work in the field Z_p[sqrt(a^2-n)]
-        int asquaredminusn = (a*a - n) % p;
+        int asquaredminusn = (((a*a - n) % p) + p) % p;
         vector<int> guyToRaisePowerTo = {a, 1};
         vector<int> result = cipolla_power_mod_p(guyToRaisePowerTo, (p+1)/2, asquaredminusn, p);
         
-        return result[0];
-    
+        return (result[0] % p + p) % p;
     }
 }
 

@@ -4,6 +4,7 @@
 #include <cmath>
 #include <sstream>
 #include <omp.h>
+#include <cassert>
 #include "helperfunctions.h"
 
 using namespace std;
@@ -129,7 +130,7 @@ int main(int argc, char *argv[]) {
             //B = calculatePoly(t, p, allPowersOfT, {1, 0, 0, -1, 0, 0, 1});
 
             //RANK 6 STUFF
-            /*A = (calculatePoly(t, p, allPowersOfT, {-1 * littleC, 2 * littleB}) * \
+            A = (calculatePoly(t, p, allPowersOfT, {-1 * littleC, 2 * littleB}) * \
                 (calculatePoly(t, p, allPowersOfT, {1 - bigA, 2, 1})) % p - \
                 inverse(3, p) * calculatePoly(t, p, allPowersOfT, {-1 * bigB, 2 * littleA}) * \
                 calculatePoly(t, p, allPowersOfT, {-1 * bigB, 2 * littleA}) % p) % p;
@@ -139,7 +140,7 @@ int main(int argc, char *argv[]) {
                 inverse(3, p) * calculatePoly(t, p, allPowersOfT, {-1 * bigB, 2 * littleA}) * calculatePoly(t, p, allPowersOfT, {-1 * bigC, 2 * littleB}) * \
                 (calculatePoly(t, p, allPowersOfT, {1 - bigA, 2, 1})) % p + \
                 calculatePoly(t, p, allPowersOfT, {-1 * bigD, 2 * littleC}) * power_mod_p(calculatePoly(t, p, allPowersOfT, {1 - bigA, 2, 1}), 2, p) % p) % p;
-            B = (B+p) % p;*/
+            B = (B+p) % p;
 
             /*A = 1;
             int num = 500;
@@ -150,12 +151,18 @@ int main(int argc, char *argv[]) {
 
             B = temp1 * temp2 % p;*/
 
-            A = calculatePoly(t, p, allPowersOfT, {0, 0, 1});
-            B = calculatePoly(t, p, allPowersOfT, {0, 0, 0, 1});
-
-
             //cout << "A = " << A << ", B = " << B << endl;
 
+
+            //step 0: we need these guys to be greater than 0
+            A = ((A % p) + p) % p;
+            B = ((B % p) + p) % p;
+
+            if (A < 0 || B < 0) {
+                while (true) {
+                    cout << "A = " << A << ", B = " << B << endl;
+                }
+            }
             //step 1: figure out what residue class A is in
             for (int i = 0; i <= reps.size(); i++) {
                 if (reps[i] == 0) {
@@ -191,6 +198,12 @@ int main(int argc, char *argv[]) {
 
             //step 3: calculate B and lookup
             B = B * inverse(lsixth, p) % p;
+
+            if (A < 0 || B < 0) {
+                while (true) {
+                    cout << "A = " << A << ", B = " << B << endl;
+                }
+            }
 
             readThing = get_value_from_file(p, repline, B, file);
             value += pow(readThing, 2);
