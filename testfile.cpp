@@ -39,6 +39,15 @@ void testLargeNumModP() {
 }
 // Main function
 int main(int argc, char *argv[]) {
-    testLargeNumModP();
+    //testLargeNumModP();
+
+    vector<int> primes = generate_primes_in_range(0, 1000);
+    for (int p : primes) {
+        if (isFourthPower(p-12, p)) {
+            cout << "-12 is a fourth power mod " << p << "\n";
+        } else {
+            cout << "-12 is not a fourth power mod " << p << "\n";
+        }
+    }
     return 0;
 }
