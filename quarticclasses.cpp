@@ -16,6 +16,7 @@ void compute_a_constants(int lower, int upper) {
     //first index is the prime, second index whatever the input is
     
     vector<vector<int>> bigArray(upper-lower, vector<int>(upper, 0));
+    //this is ok to be an int
 
     // Function to calculate Legendre symbols for each prime
     for (int p : primes) {
@@ -26,7 +27,6 @@ void compute_a_constants(int lower, int upper) {
     // Write results to file
     #pragma omp parallel for
     for (int prime : primes) {
-        cout << "Primes Remaining: " << numPrimes-- << "\n";
         //cout << "Starting prime " << prime << "\n";
         std::string filename = "classdata/file_" + std::to_string(prime) + ".csv";
         
@@ -49,6 +49,7 @@ void compute_a_constants(int lower, int upper) {
                     file << c << "," << b << "," << result << "\n";
                 }
             }
+            cout << "Primes Remaining: " << --numPrimes << "\n";
             file.close();
         } else {
             cerr << "Unable to open file";

@@ -283,3 +283,24 @@ long largenummodp(vector<long>& digits, int prime) {
     }
     return res;
 }
+
+void generateSequences(const std::vector<int>& nums, int length, std::vector<int>& current, std::vector<std::vector<int>>& result) {
+    if (length == 0) {
+        result.push_back(current);
+        return;
+    }
+    
+    for (int num : nums) {
+        current.push_back(num);
+        generateSequences(nums, length - 1, current, result);
+        current.pop_back(); // backtrack
+    }
+}
+
+// Function to generate all possible sequences of a given length
+std::vector<std::vector<int>> generateAllSequences(const std::vector<int>& nums, int length) {
+    std::vector<std::vector<int>> result;
+    std::vector<int> current;
+    generateSequences(nums, length, current, result);
+    return result;
+}

@@ -3,7 +3,8 @@
 #include <vector>
 #include <cmath>
 #include <sstream>
-#include "helperfunctionsfamilysearch.h"
+#include "helperfunctions.h"
+#include <omp.h>
 
 using namespace std;
 
@@ -35,7 +36,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    double thresh = 0.25; // threshold for what to write to output file if positive
+    double thresh = 0.95; // threshold for what to write to output file if positive
 
     int n = atoi(argv[1]); //how high do you want to go with your primes
     int filterOn = atoi(argv[2]); //turns filter on or not
@@ -67,6 +68,7 @@ int main(int argc, char *argv[]) {
     std::vector<std::vector<int>> coeffs2;
     coeffs2.push_back(Blist);
     */
+    #pragma omp parallel for
 
     for (const auto& seqA : coeffs) {
         // For loop to choose A polynomial
@@ -84,6 +86,7 @@ int main(int argc, char *argv[]) {
         }
 
         for (const auto& seqB : coeffs) {
+            //cout << "hello" << endl;
              // Exclude all zero sequence corresponding to B = 0
             bool flag = true;
             for (int i = 0; i < length; i++){
@@ -111,6 +114,7 @@ int main(int argc, char *argv[]) {
 
             // For loop to choose B polynomial
 
+            
             for (int p : primes) {
                 if (filterOn) {
                     if (p % filterB != filterA) {
@@ -232,14 +236,14 @@ int main(int argc, char *argv[]) {
                     textA = textA + std::to_string(seqA[i]);
                     textB = textB + std::to_string(seqB[i]);
                 }
-                std::string outputfilename = textA + textB + ".txt";
+                std::string outputfilename = "familysearchdata/" + textA + textB + ".txt";
                 cout << "Finished with family " << outputfilename << endl;
                 cout << "Percent of time positive " << (positivecount * 1.0)/primecount << endl;
 
                 std::ofstream output_file(outputfilename);
                 if (!output_file.is_open()) {
-                    std::cerr << "Unable to open output file" << std::endl;
-                    return 1;
+                    cout << "Unable to open output file" << std::endl;
+                    //return 1;
                 }
 
                 for (size_t i = 0; i < x.size(); ++i) {

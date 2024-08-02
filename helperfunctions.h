@@ -32,3 +32,7 @@ int getAp(int p, int A, int B);
 int get_value_from_file(int prime, int repline, int b, ifstream &file);
 
 long largenummodp(vector<long>& digits, int prime);
+
+void generateSequences(const std::vector<int>& nums, int length, std::vector<int>& current, std::vector<std::vector<int>>& result);
+
+vector<vector<int>> generateAllSequences(const std::vector<int>& nums, int length);
