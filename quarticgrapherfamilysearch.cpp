@@ -48,7 +48,9 @@ int main(int argc, char *argv[]) {
     int length = 6; // Length of sequences to generate so desired degree - 1
     
     // Generate sequences of coefficients
+    // Code reads coeffs for A as going from degree 0 to degree (length - 1) from left to right
     std::vector<std::vector<int>> coeffs = generateAllSequences(nums, length);
+
     // Code for testing particular sequence to do so change
     // Outer for loop to go over coeffs1 and inner for loop to go over coeffs2 
     /*std::vector<int> Alist;
@@ -159,6 +161,7 @@ int main(int argc, char *argv[]) {
                     long B = 0;
                     long powT = 0;
                     for (int i = 0; i < length; i++) {
+                        // Polynomials created so that seqA[i] is the coeff of the i^th degree term
                         if (i == 0) {
                             powT = 1;
                         } else {
@@ -229,6 +232,7 @@ int main(int argc, char *argv[]) {
                 std::string textA = "dataA";
                 std::string textB = "B";
                 for (int i = 0; i < length; i++) {
+                    // Polynomials are created so that seqA[i] is the coeff of the i^th degree term
                     textA = textA + std::to_string(seqA[i]);
                     textB = textB + std::to_string(seqB[i]);
                 }
