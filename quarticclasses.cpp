@@ -41,32 +41,38 @@ void compute_a_constants(int lower, int upper) {
             vector<int> residueClasses = findQuarticResidueClasses(primes[p]);
             int numResidueClasses = residueClasses.size();
             // do c=0 !!
-            
-            if (p % 3 == 1) {
-                vector<int> vals;
                 // don't store A = 0 B = 0 since always 0
-                int counter = 0;
+            if (primes[p] % 3 == 1) {
+                vector<int> vals;
+                int numWritten = 0;
                 bool flag = true;
                 for (int b = 1; b < primes[p]; b++) { //run over all bs
                     flag = true;
-                    if (counter == 6){
+                    // Check how many distinct values have been computed, if 6 we are finished
+                    if (numWritten == 6){
                         break;
-                    }   
+                    }
+
                     long result = 0;
+                    // Compute value
                     for (int x = 0; x < primes[p]; x++) {
                         int value = (power_mod_p((long)x, 3, primes[p]) + b) % primes[p]; // A = 0 so no linear term
                         result += bigArray[primes[p]-lower][value];
                     }
+
+                    // Check if computed value has been seen before
                     for (int i = 0; i < counter; i++) {
                         if (result == vals[i]){
                             flag = false;
                             break;
                         }
                     }
+
+                    // If flag = true has not been seen before so we add to seen vals and write to the file and increment counter
                     if (flag) {
                         vals.push_back(result);
                         file << b << "," << result << "\n";
-                        counter++;
+                        numWritten++;
                     }
                 }
                 // counter stores the number of things put into vals which will always be 6
