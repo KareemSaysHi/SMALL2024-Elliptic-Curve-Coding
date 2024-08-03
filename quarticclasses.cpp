@@ -24,6 +24,7 @@ void compute_a_constants(int lower, int upper) {
         for (int x = 0; x < primes[p]; ++x) {
             bigArray[primes[p]-lower][x] = legendre_symbol(x, primes[p]);
         }
+        cout << "finished legendre symbols for " << primes[p] << "\n"; 
     }
     // Write results to file
     #pragma omp parallel for
