@@ -65,7 +65,7 @@ void compute_a_constants(int lower, int upper) {
                     }
                     if (flag) {
                         vals.push_back(result);
-                        file << b << "," << vals[i] << "\n";
+                        file << b << "," << result << "\n";
                         counter++;
                     }
                 }
