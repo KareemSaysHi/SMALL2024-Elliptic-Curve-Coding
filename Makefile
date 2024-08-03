@@ -1,6 +1,6 @@
 # MACROS
 CC = g++
-CFLAGS = -fopenmp
+CFLAGS = -fopenmp -O3
 
 # Dependency rules for non-file targets
 all: computegarbage graphgarbage familygarbage
