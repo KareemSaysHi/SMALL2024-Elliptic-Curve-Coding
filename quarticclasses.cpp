@@ -37,10 +37,43 @@ void compute_a_constants(int lower, int upper) {
 
         if (file.is_open()) {
             //file << findQuarticResidueClasses(prime) << "\n";
-            file << "a,b,value\n";
+            //file << "a,b,value\n";
             vector<int> residueClasses = findQuarticResidueClasses(primes[p]);
             int numResidueClasses = residueClasses.size();
-            for (int c = 0; c < numResidueClasses; c++) { //run over all residue classes
+            // do c=0 !!
+            
+            if (p % 3 == 1) {
+                vector<int> vals;
+                // don't store A = 0 B = 0 since always 0
+                int counter = 0;
+                bool flag = true;
+                for (int b = 1; b < primes[p]; b++) { //run over all bs
+                    flag = true;
+                    if (counter == 6){
+                        break;
+                    }   
+                    long result = 0;
+                    for (int x = 0; x < primes[p]; x++) {
+                        int value = (power_mod_p((long)x, 3, primes[p]) + b) % primes[p]; // A = 0 so no linear term
+                        result += bigArray[primes[p]-lower][value];
+                    }
+                    for (int i = 0; i < counter; i++) {
+                        if (result == vals[i]){
+                            flag = false;
+                            break;
+                        }
+                    }
+                    if (flag) {
+                        vals.push_back(result);
+                        file << b << "," << vals[i] << "\n";
+                        counter++;
+                    }
+                }
+                // counter stores the number of things put into vals which will always be 6
+            }
+
+            for (int c = 1; c < numResidueClasses; c++) { //run over all residue classes, 
+            // dont do c=0!!!
                 for (int b = 0; b < primes[p]; b++) { //run over all bs
                     long result = 0;
                     for (int x = 0; x < primes[p]; x++) {
@@ -49,7 +82,8 @@ void compute_a_constants(int lower, int upper) {
                         result += bigArray[primes[p]-lower][value];
                         //result += power_mod_p(value ,int((prime - 1)/2), prime);
                     }
-                    file << residueClasses[c] << "," << b << "," << result << "\n";
+                    //file << residueClasses[c] << "," << b << "," << result << "\n";
+                    file << result << '\n';
                 }
             }
             cout << "Primes Remaining: " << --numPrimes << "\n";
