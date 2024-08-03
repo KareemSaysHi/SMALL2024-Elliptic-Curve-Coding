@@ -19,16 +19,16 @@ void compute_a_constants(int lower, int upper) {
     //this is ok to be an int
 
     // Function to calculate Legendre symbols for each prime
-    for (int p : primes) {
-        for (int x = 0; x < p; ++x) {
-            bigArray[p-lower][x] = legendre_symbol(x, p);
+    for (int p = 0; p < numPrimes; p++) {
+        for (int x = 0; x < primes[p]; ++x) {
+            bigArray[primes[p]-lower][x] = legendre_symbol(x, primes[p]);
         }
     }
     // Write results to file
     #pragma omp parallel for
-    for (int prime : primes) {
+    for (int p = 0; p < numPrimes; p++) {
         //cout << "Starting prime " << prime << "\n";
-        std::string filename = "classdata/file_" + std::to_string(prime) + ".csv";
+        std::string filename = "classdata/file_" + std::to_string(primes[p]) + ".csv";
         
         ofstream file;
         file.open(filename);
@@ -36,17 +36,18 @@ void compute_a_constants(int lower, int upper) {
         if (file.is_open()) {
             //file << findQuarticResidueClasses(prime) << "\n";
             file << "a,b,value\n";
-            vector<int> residueClasses = findQuarticResidueClasses(prime);
-            for (int c : residueClasses) { //run over all residue classes
-                for (int b = 0; b < prime; b++) { //run over all bs
+            vector<int> residueClasses = findQuarticResidueClasses(primes[p]);
+            int numResidueClasses = residueClasses.size();
+            for (int c = 0; c < numResidueClasses; c++) { //run over all residue classes
+                for (int b = 0; b < primes[p]; b++) { //run over all bs
                     long result = 0;
-                    for (int x = 0; x < prime; x++) {
-                        int value = (power_mod_p((long)x, 3, prime) + c * x + b) % prime;
+                    for (int x = 0; x < primes[p]; x++) {
+                        int value = (power_mod_p((long)x, 3, primes[p]) + residueClasses[c] * x + b) % primes[p];
                         
-                        result += bigArray[prime-lower][value];
+                        result += bigArray[primes[p]-lower][value];
                         //result += power_mod_p(value ,int((prime - 1)/2), prime);
                     }
-                    file << c << "," << b << "," << result << "\n";
+                    file << residueClasses[c] << "," << b << "," << result << "\n";
                 }
             }
             cout << "Primes Remaining: " << --numPrimes << "\n";
