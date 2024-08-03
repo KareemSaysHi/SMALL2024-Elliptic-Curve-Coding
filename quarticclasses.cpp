@@ -61,7 +61,7 @@ void compute_a_constants(int lower, int upper) {
                     }
 
                     // Check if computed value has been seen before
-                    for (int i = 0; i < counter; i++) {
+                    for (int i = 0; i < numWritten; i++) {
                         if (result == vals[i]){
                             flag = false;
                             break;
