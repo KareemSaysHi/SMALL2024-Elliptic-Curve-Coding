@@ -49,7 +49,8 @@ void compute_a_constants(int lower, int upper) {
                         result += bigArray[primes[p]-lower][value];
                         //result += power_mod_p(value ,int((prime - 1)/2), prime);
                     }
-                    file << residueClasses[c] << "," << b << "," << result << "\n";
+                    file << result << "\n";
+                    //file << residueClasses[c] << "," << b << "," << result << "\n";
                 }
             }
             cout << "Primes Remaining: " << --numPrimes << "\n";
