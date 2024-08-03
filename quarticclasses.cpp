@@ -19,6 +19,7 @@ void compute_a_constants(int lower, int upper) {
     //this is ok to be an int
 
     // Function to calculate Legendre symbols for each prime
+    #pragma omp parallel for
     for (int p = 0; p < numPrimes; p++) {
         for (int x = 0; x < primes[p]; ++x) {
             bigArray[primes[p]-lower][x] = legendre_symbol(x, primes[p]);
