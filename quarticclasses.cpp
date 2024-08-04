@@ -8,27 +8,27 @@
 
 using namespace std;
 
-void compute_a_constants(int lower, int upper) {
-    vector<int> primes = generate_primes_in_range(lower, upper);
-    int numPrimes = primes.size();
+void compute_a_constants(long lower, long upper) {
+    vector<long> primes = generate_primes_in_range(lower, upper);
+    long numPrimes = primes.size();
 
     // Create a 2D array to store Legendre symbols
     //first index is the prime, second index whatever the input is
     
     vector<vector<int>> bigArray(upper-lower, vector<int>(upper, 0));
-    //this is ok to be an int
+    //this is ok to be an int because Legendre symbol
 
     // Function to calculate Legendre symbols for each prime
     #pragma omp parallel for
-    for (int p = 0; p < numPrimes; p++) {
-        for (int x = 0; x < primes[p]; ++x) {
+    for (long p = 0; p < numPrimes; p++) {
+        for (long x = 0; x < primes[p]; ++x) {
             bigArray[primes[p]-lower][x] = legendre_symbol(x, primes[p]);
         }
         cout << "finished legendre symbols for " << primes[p] << "\n"; 
     }
     // Write results to file
     #pragma omp parallel for
-    for (int p = 0; p < numPrimes; p++) {
+    for (long p = 0; p < numPrimes; p++) {
         //cout << "Starting prime " << prime << "\n";
         std::string filename = "classdata/file_" + std::to_string(primes[p]) + ".csv";
         
@@ -38,15 +38,16 @@ void compute_a_constants(int lower, int upper) {
         if (file.is_open()) {
             //file << findQuarticResidueClasses(prime) << "\n";
             //file << "a,b,value\n";
+            // OK to be an int
             vector<int> residueClasses = findQuarticResidueClasses(primes[p]);
             int numResidueClasses = residueClasses.size();
             // do c=0 !!
                 // don't store A = 0 B = 0 since always 0
             if (primes[p] % 3 == 1) {
-                vector<int> vals;
+                vector<long> vals;
                 int numWritten = 0;
                 bool flag = true;
-                for (int b = 1; b < primes[p]; b++) { //run over all bs
+                for (long b = 1; b < primes[p]; b++) { //run over all bs
                     flag = true;
                     // Check how many distinct values have been computed, if 6 we are finished
                     if (numWritten == 6){
@@ -55,8 +56,8 @@ void compute_a_constants(int lower, int upper) {
 
                     long result = 0;
                     // Compute value
-                    for (int x = 0; x < primes[p]; x++) {
-                        int value = (power_mod_p((long)x, 3, primes[p]) + b) % primes[p]; // A = 0 so no linear term
+                    for (long x = 0; x < primes[p]; x++) {
+                        long value = (power_mod_p(x, 3, primes[p]) + b) % primes[p]; // A = 0 so no linear term
                         result += bigArray[primes[p]-lower][value];
                     }
 
@@ -72,18 +73,18 @@ void compute_a_constants(int lower, int upper) {
                     if (flag) {
                         vals.push_back(result);
                         file << b << "," << result << "\n";
+                        // numWritten stores the number of things put into vals which will always be 6
                         numWritten++;
                     }
                 }
-                // counter stores the number of things put into vals which will always be 6
             }
 
             for (int c = 1; c < numResidueClasses; c++) { //run over all residue classes, 
             // dont do c=0!!!
-                for (int b = 0; b < primes[p]; b++) { //run over all bs
+                for (long b = 0; b < primes[p]; b++) { //run over all bs
                     long result = 0;
-                    for (int x = 0; x < primes[p]; x++) {
-                        int value = (power_mod_p((long)x, 3, primes[p]) + residueClasses[c] * x + b) % primes[p];
+                    for (long x = 0; x < primes[p]; x++) {
+                        long value = (power_mod_p(x, 3, primes[p]) + residueClasses[c] * x + b) % primes[p];
                         
                         result += bigArray[primes[p]-lower][value];
                         //result += power_mod_p(value ,int((prime - 1)/2), prime);
@@ -108,8 +109,8 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    int lower = atoi(argv[1]);
-    int upper = atoi(argv[2]);
+    long lower = strtol(argv[1]);
+    long upper = strtol(argv[2]);
 
     compute_a_constants(lower, upper);
     
