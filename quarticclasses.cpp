@@ -47,7 +47,7 @@ void compute_a_constants(long lower, long upper) {
                 vector<long> vals;
                 int numWritten = 0;
                 bool flag = true;
-                for (int b = 1; b < primes[p]; b++) { //run over all bs
+                for (long b = 1; b < primes[p]; b++) { //run over all bs
                     flag = true;
                     // Check how many distinct values have been computed, if 6 we are finished
                     if (numWritten == 6){
