@@ -18,7 +18,7 @@ long power_mod_p(long a, int b, int p) {
         }
 
         b = b >> 1;
-        arcst = (arsct * arcst) % p;
+        arcst = (arcst * arcst) % p;
     }
     return (long) (((result % p) + p ) % p);
 }
