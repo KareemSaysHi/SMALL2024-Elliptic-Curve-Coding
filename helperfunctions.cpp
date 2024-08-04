@@ -10,16 +10,17 @@ using namespace std;
 
 // Function to calculate a^b mod p without overflow
 long power_mod_p(long a, int b, int p) {
-    long result = 1;
+    long long arcst = (long long) a; //Cast a to long long data type to avoid overflow when squaring
+    long long result = 1;
     while (b > 0) {
         if (b % 2 == 1) {
-            result = (result * a) % p;
+            result = (result * arcst) % p;
         }
 
         b = b >> 1;
-        a = (a * a) % p;
+        arcst = (arsct * arcst) % p;
     }
-    return ((result % p) + p ) % p;
+    return (long) (((result % p) + p ) % p);
 }
 
 // Function to calculate Legendre symbol
