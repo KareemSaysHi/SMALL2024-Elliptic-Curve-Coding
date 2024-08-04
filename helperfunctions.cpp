@@ -9,7 +9,7 @@
 using namespace std;
 
 // Function to calculate a^b mod p without overflow
-long power_mod_p(long a, int b, int p) {
+long power_mod_p(long a, long b, long p) {
     long long arcst = (long long) a; //Cast a to long long data type to avoid overflow when squaring
     long long result = 1;
     while (b > 0) {
@@ -24,10 +24,10 @@ long power_mod_p(long a, int b, int p) {
 }
 
 // Function to calculate Legendre symbol
-int legendre_symbol(int x, int p) {
+int legendre_symbol(long x, long p) {
     if (x % p == 0) {
         return 0;
-    } else if (power_mod_p(x, int((p-1)/2), p) == 1) {
+    } else if (power_mod_p(x, long((p-1)/2), p) == 1) {
         return 1;
     } else {
         return -1;
@@ -35,25 +35,25 @@ int legendre_symbol(int x, int p) {
 }
 
 //find inverse of a mod p
-int inverse(int a, int p) {
+long inverse(long a, long p) {
     return power_mod_p(a, p-2, p);
 }
 
 // Returs true if fourth power mod p, otherwise returns false
-bool isFourthPower(int x, int p) {
+bool isFourthPower(long x, long p) {
     if (p % 4 == 1) {
-        if (power_mod_p(x, int((p-1)/4), p) == 1) { //1 iff x is a fourth power mod p since multiplicative group is cyclic
+        if (power_mod_p(x, long((p-1)/4), p) == 1) { //1 iff x is a fourth power mod p since multiplicative group is cyclic
             return true;
         }
     } else {
-        if (power_mod_p(x, int((p-1)/2), p) == 1) { //in 3 mod 4, if you're a square, you're a fourth power!
+        if (power_mod_p(x, long((p-1)/2), p) == 1) { //in 3 mod 4, if you're a square, you're a fourth power!
             return true;
         }
     }
     return false;
 }
 
-vector<int> findQuarticResidueClasses(int p) {
+vector<int> findQuarticResidueClasses(long p) {
     //need to make this work for p = 2, 3, maybe 5
     if (p == 2) {
         return vector<int>{0, 1};
@@ -97,11 +97,11 @@ vector<int> findQuarticResidueClasses(int p) {
 }
 
 // Function to generate prime numbers up to k
-vector<int> generate_primes_in_range(int lower, int upper) {
-    vector<int> primes;
-    for (int num = 2; num < upper; num++) {
+vector<long> generate_primes_in_range(long lower, long upper) {
+    vector<long> primes;
+    for (long num = 2; num < upper; num++) {
         bool is_prime = true;
-        for (int i = 2; i <= sqrt(num); i++) {
+        for (long i = 2; i <= sqrt(num); i++) {
             if (num % i == 0) {
                 is_prime = false;
                 break;
