@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     int highestPower = 120;
 
 
-    std::vector<int> primes = generate_primes_in_range(0, n);
+    std::vector<long> primes = generate_primes_in_range(0, n);
 
     vector<int> x; /*primes*/
     vector<double> y; /*A-values*/

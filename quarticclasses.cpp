@@ -109,8 +109,8 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    long lower = strtol(argv[1]);
-    long upper = strtol(argv[2]);
+    long lower = stol(argv[1]);
+    long upper = stol(argv[2]);
 
     compute_a_constants(lower, upper);
     

@@ -3,7 +3,8 @@ CC = g++
 CFLAGS = -fopenmp -O3
 
 # Dependency rules for non-file targets
-all: computegarbage graphgarbage familygarbage
+all: computegarbage 
+#graphgarbage familygarbage
 
 clobber: clean
 	rm -f *~ \#*\# 
