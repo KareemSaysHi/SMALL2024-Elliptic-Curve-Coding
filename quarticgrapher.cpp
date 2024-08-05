@@ -3,15 +3,16 @@
 #include <vector>
 #include <cmath>
 #include <sstream>
+#include <string>
 #include <omp.h>
 #include <cassert>
 #include "helperfunctions.h"
 
 using namespace std;
 
-vector<vector<int>> getPowersOfTmodP(int p, int highestPower) {
-    vector<vector<int>> powers(p, vector<int>(highestPower, 0));
-    for (int t = 0; t < p; t++) {
+vector<vector<long>> getPowersOfTmodP(long p, int highestPower) {
+    vector<vector<long>> powers(p, vector<long>(highestPower, 0));
+    for (long t = 0; t < p; t++) {
         for (int power = 0; power < highestPower; power++) {
             powers[t][power] = power_mod_p(t, power, p);
         }
@@ -19,8 +20,8 @@ vector<vector<int>> getPowersOfTmodP(int p, int highestPower) {
     return powers;
 }
 
-int calculatePoly(int t, int p, const vector<vector<int>>& powersOfT, const vector<int>& coeffs) {
-    int result = 0;
+long calculatePoly(int t, int p, const vector<vector<long>>& powersOfT, const vector<int>& coeffs) {
+    long result = 0;
     int count = 0;
     for (int coeff: coeffs) {
         result += coeff * powersOfT[t][count];
@@ -30,7 +31,7 @@ int calculatePoly(int t, int p, const vector<vector<int>>& powersOfT, const vect
     return result;
 }
 
-vector<long> getBigGuysForRankSix(int p) {
+vector<long> getBigGuysForRankSix(long p) {
     vector<long> bigA = {0, 5600, 4482, 6100, 891};
     vector<long> littleC = {0, 848, 1499, 2};
     vector<long> littleB = {9600, 7480, 6031, 1};
@@ -67,154 +68,191 @@ int main(int argc, char *argv[]) {
     int highestPower = 120;
 
 
-    std::vector<long> primes = generate_primes_in_range(0, n);
+    //std::vector<long> primes = generate_primes_in_range(0, n);
+    std::vector<long> primes;// = [2,3,5,7,11];
+    /*primes.push_back(2);
+    primes.push_back(3);
+    primes.push_back(5);
+    primes.push_back(7);*/
+    primes.push_back(11);
+    //primes.push_back(13);
+    //primes.push_back(17);
 
     vector<int> x; /*primes*/
     vector<double> y; /*A-values*/
+    vector<double> z; /*A-values*/
+    vector<float> secondMoment; /*A-values*/
+
+    float runningsum = 0;
+    float weightedrunningsum = 0;
+    int primecount = 0;
+    float weightedprimecount = 0;
+    int positivecount = 0;
+    int weightedpositivecount = 0;
+
+
+    auto start = std::chrono::system_clock::now();
 
     #pragma omp parallel for
-    for (int p : primes) {
+    for (long p : primes) {
 
-        vector<vector<int>> allPowersOfT = getPowersOfTmodP(p, highestPower);
+        vector<vector<long>> allPowersOfT = getPowersOfTmodP(p, highestPower);
 
         // FOR RANK 6 STUFF
-        vector<long> bigGuys = getBigGuysForRankSix(p);
+        /*vector<long> bigGuys = getBigGuysForRankSix(p);
         long bigA = bigGuys[0];
         long bigB = -1 * bigGuys[1];
         long bigC = bigGuys[2];
         long bigD = -1 * bigGuys[3];
         long littleA = bigGuys[4];
         long littleB = -1 * bigGuys[5];
-        long littleC = bigGuys[6];
-
+        long littleC = bigGuys[6];*/
 
         if (filterOn) {
-            if (p % filterB != filterA || p <= 5) {
+            if (p % filterB != filterA) {
                 continue;
             }
         }
+        if (p <= 5) continue;
 
         int A = 0;
         int B = 0;
         int c = 0;
         int value = 0;
-        int readThing = 0;
         int repline = 0;
 
-        cout << "on prime " << p << std::endl;
-
+        //cout << "on prime " << p << std::endl;                
         string filename = "classdata/file_" + to_string(p) + ".csv";
 
-        ifstream file;
-        file.open(filename);
+        int MAX_ROWS;
+        if (p % 4 == 1) MAX_ROWS = 4*p;
+        else MAX_ROWS = 2*p;
+        ifstream file(filename);
+        
+        if (!file.is_open()){
+            cerr << "Error opening file!" << endl;
+            return 1;
+        }
 
+        int data[MAX_ROWS];
+        int dataFor0Bs[6];
+        int dataFor0Aps[6];
+        std::string line;
+
+        int lineCount = 0;
+        while (getline(file, line)) {
+            std::stringstream ss(line);
+            string a, b;
+
+            if (lineCount < 6 && p == 1 % 3) {
+                if (getline(ss, a, ',') && getline(ss, b)) {
+                    dataFor0Bs[lineCount] = stoi(a);
+                    dataFor0Aps[lineCount] = stoi(b);
+                }
+            } else //(lineCount < 6 + MAX_ROWS) 
+            {
+                if (getline(ss, a)) {
+                    data[lineCount-6] = stoi(a);
+                }
+            } 
+
+            ++lineCount;
+        }
+        file.close();
         
         vector<int> reps = findQuarticResidueClasses(p);
 
-        for (int t = 0; t < p; ++t) {
-            
-            //here we'll be looking at x^3 + A(T)x + B(T)
+        for (long t = 0; t < p; ++t) {
+            //int t2 = power_mod_p(t, 2, p);
+            long t3 = power_mod_p(t, 3, p);
+            //int t4 = power_mod_p(t, 4, p);
+            //int t5 = power_mod_p(t, 5, p);
+            //int t6 = power_mod_p(t, 6, p);
+            //int t7 = power_mod_p(t, 7, p);
+            //int t8 = power_mod_p(t, 8, p);
+            long t9 = power_mod_p(t, 9, p);
+            //int t10= power_mod_p(t, 10, p);
 
-            //define the function we're going to be looking at
-            /*int t_cubed = (((t * t) % p) * t) % p;
-            int t_squared = (t * t) % p;
             A = 1;
-            B = t_squared % p; */
-
-            //x^3 + x + t^3
-            //A = 1;
-            //B = calculatePoly(t, p, allPowersOfT, {0, 0, 0, 1});
-
-            //x^3 + x + (18th cyclotomic)
-            //A = 2;
-            //B = calculatePoly(t, p, allPowersOfT, {1, 0, 0, -1, 0, 0, 1});
-
-            //RANK 6 STUFF
-            A = (calculatePoly(t, p, allPowersOfT, {-1 * littleC, 2 * littleB}) * \
-                (calculatePoly(t, p, allPowersOfT, {1 - bigA, 2, 1})) % p - \
-                inverse(3, p) * calculatePoly(t, p, allPowersOfT, {-1 * bigB, 2 * littleA}) * \
-                calculatePoly(t, p, allPowersOfT, {-1 * bigB, 2 * littleA}) % p) % p;
-            A = (A+p) % p;
-
-            B = 2 * (power_mod_p(inverse(3, p), 3, p) * power_mod_p(calculatePoly(t, p, allPowersOfT, {-1 * bigB, 2 * littleA}), 3, p) % p - \
-                inverse(3, p) * calculatePoly(t, p, allPowersOfT, {-1 * bigB, 2 * littleA}) * calculatePoly(t, p, allPowersOfT, {-1 * bigC, 2 * littleB}) * \
-                (calculatePoly(t, p, allPowersOfT, {1 - bigA, 2, 1})) % p + \
-                calculatePoly(t, p, allPowersOfT, {-1 * bigD, 2 * littleC}) * power_mod_p(calculatePoly(t, p, allPowersOfT, {1 - bigA, 2, 1}), 2, p) % p) % p;
-            B = (B+p) % p;
-
-            /*A = 1;
-            int num = 500;
-            int res = 0; 
-
-            int temp1 = (1 + power_mod_p(t, num, p));
-            int temp2 = inverse(1+t, p);
-
-            B = temp1 * temp2 % p;*/
-
-            //cout << "A = " << A << ", B = " << B << endl;
+            B = 1;
 
 
-            //step 0: we need these guys to be greater than 0
+            // Compute Pythagorean family
+            /*int poly = 2 * t * inverse(power_mod_p(t,2,p)-1,p);
+            int b = - power_mod_p(poly,2,p) + 1;
+            int c = power_mod_p(poly,4,p);
+            A = ((c - inverse(3,p) * power_mod_p(b, 2, p)) % p + p)%p;
+            B = ((2 * inverse(27,p) * power_mod_p(b,3,p) - c * b * inverse(3,p))%p + p)%p;*/
+            
             A = ((A % p) + p) % p;
             B = ((B % p) + p) % p;
 
-            if (A < 0 || B < 0) {
-                while (true) {
-                    cout << "A = " << A << ", B = " << B << endl;
-                }
-            }
-            //step 1: figure out what residue class A is in
-            for (int i = 0; i <= reps.size(); i++) {
-                if (reps[i] == 0) {
-                    if (A == 0) {
-                        c = 0;
-                        repline = i;
+            if (A == 0) {
+                if (p == 2 % 3) continue;
+                for (int i = 0; i <= 6; i ++ ){
+                    if (power_mod_p((B * inverse(dataFor0Bs[i], p)) % p, (p-1)/6, p) == 1) {
+                        value += pow(dataFor0Aps[i], 2);
                         break;
                     }
+                    if (i == 6) {
+                        cout << "uh oh this is bad, p,A,B = " << p << "," << A  << "," << B << "\n";
+                    }
                 }
+            }
 
-                if (isFourthPower((A * inverse(reps[i], p)) % p, p)) {
-                    //cout << "found a fourth power - " << reps[i] << endl;
-                    //cout << (A * inverse(reps[i], p)) % p << endl;
-                    //cout << isFourthPower((A * inverse(reps[i], p)) % p, p) << endl;
-                    c = reps[i];
-                    repline = i;
+            //step 1: figure out what residue class A is in
+            for (int i = 1; i <= reps.size(); i++) { // i=0 will be reps[i] = 0, which is A = 0, dealt with above
+                long lfourthmaybe = (A * inverse(reps[i], p)) % p;
+
+                if (isFourthPower(lfourthmaybe, p)) {// at this point lfourthmaybe is a fourth power
+                    //step 2: calculate lsixth
+                    long lsquare = squareroot(lfourthmaybe, p);
+                    long lsixth = (lsquare * lfourthmaybe) % p;
+
+                    //step 3: calculate B and lookup
+                    B = (B * (inverse(lsixth, p)+p)) % p;
+
+                    value += pow(data[p * (i-1) + B], 2);
                     break;
                 }
             }
-
-            if (c == 0) {
-                readThing = get_value_from_file(p, repline, B, file);
-                value += pow(readThing, 2); 
-                continue;
-            }
-
-            int lfourth = A * inverse(c, p) % p;
-
-            //step 2: calulcate lsixth
-            int lsquare = squareroot(lfourth, p);
-            //int lsquare = 1;
-            int lsixth = lsquare * lfourth % p;
-
-            //step 3: calculate B and lookup
-            B = B * inverse(lsixth, p) % p;
-
-            if (A < 0 || B < 0) {
-                while (true) {
-                    cout << "A = " << A << ", B = " << B << endl;
-                }
-            }
-
-            readThing = get_value_from_file(p, repline, B, file);
-            value += pow(readThing, 2);
         }
-        cout << " p = " << p << ", sum = " << value << "\n";
+        //cout << " p = " << p << ", sum = " << value << "\n";
 
         x.push_back(p);
-        y.push_back((value - pow(p, 2)) / pow(p, 1.5)); //subtract by p^2 and divide by p^(3/2) to normalize
-    
+        float normalizedSecondMoment = (value - pow(p, 2)) / pow(p, 1.5); //subtract by p^2 and divide by p^(1.5) to normalize
+
+        runningsum += normalizedSecondMoment;
+        weightedrunningsum += normalizedSecondMoment * log(p);
+        primecount += 1;
+        weightedprimecount += log(p);
+
+        if (runningsum >= 0) positivecount ++;
+        if (weightedrunningsum >= 0) weightedpositivecount ++;
+
+        y.push_back(runningsum/primecount); 
+        z.push_back(weightedrunningsum/weightedprimecount); 
+        secondMoment.push_back(normalizedSecondMoment);
+
+        if (primecount % 100 == 0) {
+            auto now = std::chrono::system_clock::now();
+            std::chrono::duration<double> elapsed_seconds = now-start;
+            cout << "Just finished p=" 
+                << p 
+                << " which is the " 
+                << primecount 
+                << "th prime, time elapsed thusfar = " 
+                << elapsed_seconds.count() << "s " 
+                << 1.0 * positivecount / primecount 
+                << " and the current running average is "
+                << 1.0 * runningsum / primecount
+                << "\n"; // and took " << elapsed_seconds.count() << " for this gap\n";
+            //last = end;
+        }
+
         file.close();
     }
+    cout << "Running average is positive " << 1.0 * positivecount / primecount  << " and weighted running average is positive " << 1.0 * weightedpositivecount/primecount << "\n";
 
     std::ofstream output_file("data.txt");
     if (!output_file.is_open()) {
@@ -223,7 +261,7 @@ int main(int argc, char *argv[]) {
     }
 
     for (size_t i = 0; i < x.size(); ++i) {
-        output_file << x[i] << "," << y[i] << std::endl;
+        output_file << x[i] << "," << y[i] << "," << z[i] << "," << secondMoment[i] << std::endl;
     }
 
     return 0;
