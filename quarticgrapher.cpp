@@ -38,8 +38,6 @@ int main(int argc, char *argv[]) {
     int filterB = atoi(argv[4]); //modB
     int highestPowerA = atoi(argv[5]); // highest power of A so (length - 1) of seqA
     int highestPowerB = atoi(argv[6]); // highest power of B so (length - 1) of seqB
-    std::cout << highestPowerA << '\n';
-    std::cout << highestPowerB << '\n';
 
     // read in coeff sequences for A and B from command line
     vector<int> seqA;
@@ -71,11 +69,10 @@ int main(int argc, char *argv[]) {
     int a = 0;
     int b = 0;
     int highestPower = max(highestPowerA, highestPowerB);
-    cout << "highestPower: " << highestPower << '\n';
 
     #pragma omp parallel for
     for (long p : primes) {
-        vector<vector<long>> allPowersOfT = getPowersOfTmodP(p, highestPower + 1);
+        vector<vector<long>> allPowersOfT = getPowersOfTmodP(p, highestPower + 1); // Note highestPower is the max of the degree of A and B whereas getPowersOfTmodP only computes up to highestPower-1
 
         if (filterOn) {
             if (p % filterB != filterA || p <= 5) {
