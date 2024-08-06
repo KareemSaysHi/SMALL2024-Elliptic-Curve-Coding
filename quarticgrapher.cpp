@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
         
         if (!file.is_open()){
             cerr << "Error opening file for prime " <<  p << endl;
-            return 1;
+            continue;
         }
 
         int data[MAX_ROWS];
@@ -143,6 +143,7 @@ int main(int argc, char *argv[]) {
         // Check if file had correct number of lines
         if (abs(lineCount - MAX_ROWS) > 7) {
             cout << "File for prime " << p << " has " << lineCount << " lines. Expected approximately " << MAX_ROWS << ".\n";
+            continue;
         }
 
         vector<int> reps = findQuarticResidueClasses(p);
