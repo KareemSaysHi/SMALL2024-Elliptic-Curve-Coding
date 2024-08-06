@@ -74,7 +74,8 @@ int main(int argc, char *argv[]) {
     cout << "highestPower: " << highestPower << '\n';
 
     #pragma omp parallel for
-    for (long p : primes) {
+    for (int j = 0; j < primes.size(); j++) {
+        long p = primes[j];
         vector<vector<long>> allPowersOfT = getPowersOfTmodP(p, highestPower + 1);
 
         if (filterOn) {
