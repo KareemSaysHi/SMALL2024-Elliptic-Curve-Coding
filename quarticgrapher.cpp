@@ -3,7 +3,7 @@
 #include <vector>
 #include <cmath>
 #include <sstream>
-#include <omp.h>
+//#include <omp.h>
 #include <cassert>
 #include "helperfunctions.h"
 
@@ -38,6 +38,8 @@ int main(int argc, char *argv[]) {
     int filterB = atoi(argv[4]); //modB
     int highestPowerA = atoi(argv[5]); // highest power of A so (length - 1) of seqA
     int highestPowerB = atoi(argv[6]); // highest power of B so (length - 1) of seqB
+    std::cout << highestPowerA << '\n';
+    std::cout << highestPowerB << '\n';
 
     // read in coeff sequences for A and B from command line
     vector<int> seqA;
@@ -51,8 +53,16 @@ int main(int argc, char *argv[]) {
     for (int i = start; i <= highestPowerB + start; i++) {
         seqB.push_back(atoi(argv[i]));
     }
+
+    for (int i = 0; i <= highestPowerA; i++) {
+        cout << "A index: " << i << " value: " << seqA[i] << '\n';
+    }
+
+    for (int i = 0; i <= highestPowerB; i++) {
+        cout << "B index: " << i << " value: " << seqB[i] << '\n';
+    }
     
-    std::vector<long> primes = generate_primes_in_range(3, n);
+    std::vector<long> primes = generate_primes_in_range(2, n);
 
     vector<long> x; /*primes*/
     vector<float> y; /*A-values*/
@@ -69,10 +79,11 @@ int main(int argc, char *argv[]) {
     int a = 0;
     int b = 0;
     int highestPower = max(highestPowerA, highestPowerB);
+    cout << "highestPower: " << highestPower << '\n';
 
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for (long p : primes) {
-        vector<vector<long>> allPowersOfT = getPowersOfTmodP(p, highestPower + 1); // Note highestPower is the max of the degree of A and B whereas getPowersOfTmodP only computes up to highestPower-1
+        vector<vector<long>> allPowersOfT = getPowersOfTmodP(p, highestPower + 1);
 
         if (filterOn) {
             if (p % filterB != filterA || p <= 5) {
@@ -90,50 +101,31 @@ int main(int argc, char *argv[]) {
         cout << "on prime " << p << std::endl;
 
         string filename = "classdata/file_" + to_string(p) + ".csv";
+        cout << to_string(p);
 
-        int MAX_ROWS;
-        if (p % 4 == 1) MAX_ROWS = 4*p;
-        else MAX_ROWS = 2*p;
-        ifstream file(filename);
-        
-        if (!file.is_open()){
-            cerr << "Error opening file!" << endl;
-            return 1;
+        long MAX_ROWS = 5*p;
+        ifstream file;
+        file.open(filename);
+        if(!file.is_open()){
+            continue;
         }
-
+    
         int data[MAX_ROWS];
-        int dataFor0Bs[6];
-        int dataFor0Aps[6];
-        std::string line;
-
-        int lineCount = 0;
-        while (getline(file, line)) {
-            std::stringstream ss(line);
-            string a, b;
-
-            if (lineCount < 6 && p % 3 == 1) {
-                if (getline(ss, a, ',') && getline(ss, b)) {
-                    dataFor0Bs[lineCount] = stoi(a);
-                    dataFor0Aps[lineCount] = stoi(b);
+        string line;
+        int row = 0;
+        while(getline(file,line) && row < MAX_ROWS+1){
+            if (row == 0){
+                row++;
+            } else {
+            stringstream ss(line);
+            string cell;
+            for (int i = 0; getline(ss, cell, ','); ++i) {
+                if (i == 2) {
+                    data[row-1] = stoi(cell);
                 }
-                // cout << "Prime: " << p << '\n';
-                // for (int i = 0; i < 6; i++){
-                //     cout << "Index: " << i << '\n';
-                //     cout << dataFor0Bs[i] << '\n';
-                //     cout << dataFor0Aps[i] << '\n';
-                // }
-            } else //(lineCount < 6 + MAX_ROWS) 
-            {
-                if (getline(ss, a)) {
-                    if (p % 3 == 1) {
-                        data[lineCount-6] = stoi(a);
-                    } else {
-                        data[lineCount] = stoi(a);
-                    }
-                }
-            } 
-
-            ++lineCount;
+            }
+            row++;
+            }
         }
         file.close();
         vector<int> reps = findQuarticResidueClasses(p);
@@ -148,39 +140,40 @@ int main(int argc, char *argv[]) {
             A = ((A % p) + p) % p;
             B = ((B % p) + p) % p;
 
-            if (A == 0) {
-                if (p % 3 == 2 || B == 0) continue;
-                for (int i = 0; i < 6; i ++ ){
-                    if (power_mod_p((B * inverse(dataFor0Bs[i], p)) % p, (p-1)/6, p) == 1) { 
-                        value += pow(dataFor0Aps[i], 2);
+            //step 1: figure out what residue class A is in
+            for (int i = 0; i <= reps.size(); i++) {
+                if (reps[i] == 0) {
+                    if (A == 0) {
+                        c = 0;
+                        repline = i;
                         break;
                     }
-                    if (i == 5) {
-                        cout << "uh oh this is bad, p,A,B = " << p << "," << A  << "," << B << "\n";
-                        for (int i = 0; i < 6; i++) {
-                            cout << "index: " << i << " " << dataFor0Bs[i] << '\n';
-                        }
-                    }
                 }
-            }
 
-            //step 1: figure out what residue class A is in
-            for (int i = 1; i <= reps.size(); i++) { // i=0 will be reps[i] = 0, which is A = 0, dealt with above
-                long lfourthmaybe = (A * inverse(reps[i], p)) % p;
-
-                if (isFourthPower(lfourthmaybe, p)) {// at this point lfourthmaybe is a fourth power
-                    //step 2: calculate lsixth
-                    long lsquare = squareroot(lfourthmaybe, p);
-                    long lsixth = (lsquare * lfourthmaybe) % p;
-
-                    //step 3: calculate B and lookup
-                    B = (B * (inverse(lsixth, p)+p)) % p;
-
-                    value += pow(data[p * (i-1) + B], 2);
+                if (isFourthPower((A * inverse(reps[i], p)) % p, p)) {
+                    c = reps[i];
+                    repline = i;
                     break;
                 }
             }
-            //cout << "Prime: " << p << " t: " << t << " A: " << A  << " B: " << B << "value: " << value << '\n';
+
+            if (c == 0) {
+                value += pow(data[B], 2);
+            } else {
+
+                long lfourth = A * (inverse(c, p) + p) % p;
+
+                //step 2: calulcate lsixth
+                long lsquare = squareroot(lfourth, p);
+                //int lsquare = 1;
+                long lsixth = (lsquare * lfourth) % p;
+
+                //step 3: calculate B and lookup
+                B = (B * inverse(lsixth, p)) % p;
+
+                readThing = data[p * repline + B];
+                value += pow(readThing, 2);
+            }
         }
         x.push_back(p);
         float normalizedSecondMoment = (value - pow(p, 2)) / pow(p, 1.5); //subtract by p^2 and divide by p^(1.5) to normalize
