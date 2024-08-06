@@ -139,6 +139,12 @@ int main(int argc, char *argv[]) {
             ++lineCount;
         }
         file.close();
+
+        // Check if file had correct number of lines
+        if (abs(lineCount - MAX_ROWS) > 7) {
+            cout << "File for prime " << p << " has " << lineCount << " lines. Expected approximately " << MAX_ROWS << ".\n";
+        }
+
         vector<int> reps = findQuarticResidueClasses(p);
 
         for (long t = 0; t < p; ++t) {
