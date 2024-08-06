@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
     int highestPower = max(highestPowerA, highestPowerB);
     cout << "highestPower: " << highestPower << '\n';
 
-    //#pragma omp parallel for
+    #pragma omp parallel for
     for (int j = 0; j < primes.size(); j++) {
         long p = primes[j];
         vector<vector<long>> allPowersOfT = getPowersOfTmodP(p, highestPower + 1);
@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
         int readThing = 0;
         int repline = 0;
 
-        cout << "on prime " << p << std::endl;
+        if (p % 100 == 1) cout << "on prime " << p << std::endl;
 
         string filename = "classdata/file_" + to_string(p) + ".csv";
 
@@ -121,12 +121,6 @@ int main(int argc, char *argv[]) {
                     dataFor0Bs[lineCount] = stoi(a);
                     dataFor0Aps[lineCount] = stoi(b);
                 }
-                // cout << "Prime: " << p << '\n';
-                // for (int i = 0; i < 6; i++){
-                //     cout << "Index: " << i << '\n';
-                //     cout << dataFor0Bs[i] << '\n';
-                //     cout << dataFor0Aps[i] << '\n';
-                // }
             } else //(lineCount < 6 + MAX_ROWS) 
             {
                 if (getline(ss, a)) {
@@ -201,25 +195,6 @@ int main(int argc, char *argv[]) {
         //subtract by p^2 and divide by p^(1.5) to normalize
         y.push_back((value - pow(p, 2)) / pow(p, 1.5));
     }
-
-    /* 
-    // Compute running average and weighted running average
-    for (int i = 0; i < primecount; i++) {
-        runningsum += y[i];
-        weightedrunningsum += y[i] * log(p);
-        weightedprimecount += log(p);
-
-        // Calculate running average and weighted running average
-        if (runningsum >= 0) {
-            positivecount ++;
-        }
-        if (weightedrunningsum >= 0) {
-            weightedpositivecount ++;
-        }
-        y.push_back(runningsum/primecount); 
-        z.push_back(weightedrunningsum/weightedprimecount);
-    }
-    */
             
     std::string textA = "dataA";
     std::string textB = "B";
