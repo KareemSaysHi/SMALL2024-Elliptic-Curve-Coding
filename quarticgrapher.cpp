@@ -76,9 +76,25 @@ int main(int argc, char *argv[]) {
     int highestPower = max(highestPowerA, highestPowerB);
     cout << "highestPower: " << highestPower << '\n';
 
+    std::string textA;
+    std::string textB;
+    for (int i = 0; i <= highestPowerA; i++) {
+        // Polynomials are created so that seqA[i] is the coeff of the i^th degree term
+        textA = textA + std::to_string(seqA[i]);
+    }
+    for (int i = 0; i <= highestPowerB; i++) {
+        // Polynomials are created so that seqA[i] is the coeff of the i^th degree term
+        textB = textB + std::to_string(seqB[i]);
+    }
+
+    std::string outputfilename = "dataA" + textA + "B" + textB + ".txt";
+
+    cout << "Polynomial you are running is " << "A = " + textA + ", B = " textB + '\n'; 
+
     #pragma omp parallel for
     for (int j = 0; j < primes.size(); j++) {
         long p = primes[j];
+        
         vector<vector<long>> allPowersOfT = getPowersOfTmodP(p, highestPower + 1);
 
         if (filterOn) {
@@ -93,6 +109,8 @@ int main(int argc, char *argv[]) {
         long long value = 0;
 
         if (p % 100 == 1) cout << "on prime " << p << std::endl;
+
+        
 
         string filename = "classdata/file_" + to_string(p) + ".csv";
 
@@ -118,6 +136,17 @@ int main(int argc, char *argv[]) {
             fclose(fp);
         }
 
+        int MAX_ROWS = p % 4 == 1 ? 4 * p : 2 * p; // expected number of rows
+        if (abs(lineCountGood - MAX_ROWS) > 2) {
+            cout << "File for prime " << p << " has " << lineCountGood << " lines. Expected approximately " << MAX_ROWS << ".\n";
+            continue;
+        }
+
+        /*for (int i=0; i < MAX_ROWS; i++) {
+            cout << data[i] << "\n";
+        }
+        continue;*/
+
         vector<int> reps = findQuarticResidueClasses(p);
 
         for (long t = 0; t < p; ++t) {
@@ -131,7 +160,7 @@ int main(int argc, char *argv[]) {
             B = ((B % p) + p) % p;
 
             if (A == 0) {
-                if (p % 3 == 2 || B == 0) continue;
+                if (p % 3 == 2 || B == 0 || p == 3) continue;
                 for (int i = 0; i < 6; i ++ ){
                     if (power_mod_p(multmodp(B, inverse(dataFor0Bs[i], p), p), (p-1)/6, p) == 1) { 
                         value += pow(dataFor0Aps[i], 2);
@@ -172,18 +201,6 @@ int main(int argc, char *argv[]) {
         y.push_back((value - pow(p, 2)) / pow(p, 1.5));
     }
             
-    std::string textA = "dataA";
-    std::string textB = "B";
-    for (int i = 0; i <= highestPowerA; i++) {
-        // Polynomials are created so that seqA[i] is the coeff of the i^th degree term
-        textA = textA + std::to_string(seqA[i]);
-    }
-    for (int i = 0; i <= highestPowerB; i++) {
-        // Polynomials are created so that seqA[i] is the coeff of the i^th degree term
-        textB = textB + std::to_string(seqB[i]);
-    }
-
-    std::string outputfilename = textA + textB + ".txt";
     // std::cout << "Finished with family " << outputfilename << endl;
     // std::cout << "Percent of time positive " << (positivecount * 1.0)/primecount << endl;
 
