@@ -12,7 +12,7 @@ using namespace std;
 //algorithm is log(max(a,b)), so don't want to run often 
 long multmodp(long a, long b, long mod) { 
     if (a*b<=0) {//is negative if it overflows, and only want to run slow algorithm if we're in this situation
-        long res = 0; // Initialize result 
+        /*long res = 0; // Initialize result 
   
         // Update a if it is more than 
         // or equal to mod 
@@ -30,10 +30,16 @@ long multmodp(long a, long b, long mod) {
             b >>= 1; // b = b / 2 
         } 
   
-        return (res+mod)%mod; 
+        return (res+mod)%mod;
+        */
+       long long arcst = (long long) a;
+       long long brcst = (long long) b;
+       long long result = arcst * brcst;
+       if (result % mod < 0) return result % mod;
+       else return (result % mod + mod) % mod;
     }
 
-    return (((a*b)% mod)+mod)%mod; 
+    return a*b % mod;
 } 
 
 // Function to calculate a^b mod p without overflow
