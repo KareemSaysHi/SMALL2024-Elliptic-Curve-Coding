@@ -6,16 +6,17 @@ plt.rcParams.update({
     "font.family": "Helvetica"
 })
 
-# Read data back from the file
+# Read data ba"ck from the file
 x_new = [] # primes
 y_new = [] # normalized second moment
 z_new = [] # unweighted running average
 w_new = [] # weighted running average
 
 title = input("What do you want the title to be? ")
+datafile = input("What is the name of the file?")
 
 count = 0
-with open('data.csv', 'r') as file:
+with open(datafile, 'r') as file:
     for line in file:
         data = line.strip().split(',')
         x_new.append(int(data[0]))
