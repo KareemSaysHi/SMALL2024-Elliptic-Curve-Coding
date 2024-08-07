@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
         long A = 0;
         long B = 0;
         int c = 0;
-        long value = 0;
+        long long value = 0;
         int readThing = 0;
         int repline = 0;
 
