@@ -25,17 +25,6 @@ int main(int argc, char *argv[]) {
     #pragma omp parallel for
     for (long p : primes) {
         string filename = "classdata/file_" + to_string(p) + ".csv";
-
-        long MAX_ROWS;
-        if (p % 4 == 1) MAX_ROWS = 4*p;
-        else MAX_ROWS = 2*p;
-        ifstream file(filename);
-        
-        if (!file.is_open()){
-            cerr << "Error opening file for prime " <<  p << endl;
-            continue;
-        }
-
         long A = 0;
         long B = 0;
         int c = 0;
