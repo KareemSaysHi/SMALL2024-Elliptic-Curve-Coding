@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
         int readThing = 0;
         int repline = 0;
 
-        if (p % 100 == 1) cout << "on prime " << p << std::endl;
+        //if (p % 100 == 1) cout << "on prime " << p << std::endl;
 
         string filename = "classdata/file_" + to_string(p) + ".csv";
 
