@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
     int highestPower = max(highestPowerA, highestPowerB);
     cout << "highestPower: " << highestPower << '\n';
 
-    //#pragma omp parallel for
+    #pragma omp parallel for
     for (int j = 0; j < primes.size(); j++) {
         long p = primes[j];
         vector<vector<long>> allPowersOfT = getPowersOfTmodP(p, highestPower + 1);
@@ -90,8 +90,7 @@ int main(int argc, char *argv[]) {
         int readThing = 0;
         int repline = 0;
 
-        //if (p % 100 == 1) 
-        cout << "on prime " << p << std::endl;
+        if (p % 100 == 1) cout << "on prime " << p << std::endl;
 
         string filename = "classdata/file_" + to_string(p) + ".csv";
 
