@@ -15,7 +15,7 @@ This can then be graphed.
 
 
 Authors:
-    Timothy Cheek       
+    Timothy Cheek       (timcheek1729)
     Pico Gilman         (pg132)
     Kareem Jaber        (KareemSaysHi)
     Marie-Hélène Tomé   (m-ht3)
