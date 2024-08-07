@@ -8,19 +8,47 @@
 
 using namespace std;
 
+//https://www.geeksforgeeks.org/multiply-large-integers-under-large-modulo/
+//algorithm is log(max(a,b)), so don't want to run often 
+long multmodp(long a, long b, long mod) { 
+    if (a*b<=0) {//is negative if it overflows, and only want to run slow algorithm if we're in this situation
+        long res = 0; // Initialize result 
+  
+        // Update a if it is more than 
+        // or equal to mod 
+        a %= mod; 
+  
+        while (b) { 
+            // If b is odd, add a with result 
+            if (b & 1) 
+                res = (res + a) % mod; 
+  
+            // Here we assume that doing 2*a 
+            // doesn't cause overflow 
+            a = (2 * a) % mod; 
+  
+            b >>= 1; // b = b / 2 
+        } 
+  
+        return (res+mod)%mod; 
+    }
+
+    return (((a*b)% mod)+mod)%mod; 
+} 
+
 // Function to calculate a^b mod p without overflow
 long power_mod_p(long a, long b, long p) {
-    long long arcst = (long long) a; //Cast a to long long data type to avoid overflow when squaring
-    long long result = 1;
+    //long long a = (long long) a; //Cast a to long long data type to avoid overflow when squaring
+    long result = 1;
     while (b > 0) {
         if (b % 2 == 1) {
-            result = (result * arcst) % p;
+            result = multmodp(result, a, p);
         }
 
         b = b >> 1;
-        arcst = (arcst * arcst) % p;
+        a = multmodp(a, a, p);
     }
-    return (long) (((result % p) + p ) % p);
+    return ((result % p) + p) % p;
 }
 
 // Function to calculate Legendre symbol
@@ -39,7 +67,7 @@ long inverse(long a, long p) {
     return power_mod_p(a, p-2, p);
 }
 
-// Returs true if fourth power mod p, otherwise returns false
+// Returns true if fourth power mod p, otherwise returns false
 bool isFourthPower(long x, long p) {
     if (p % 4 == 1) {
         if (power_mod_p(x, long((p-1)/4), p) == 1) { //1 iff x is a fourth power mod p since multiplicative group is cyclic
@@ -62,7 +90,7 @@ vector<int> findQuarticResidueClasses(long p) {
     } else if (p == 5) {
         return vector<int>{0, 1, 2, 3, 4}; //all in different
     }
-    int thingToCheck = 0;
+    long thingToCheck = 0;
     bool inPrevResClass = false;
     vector<int> classReps;
     classReps.push_back(0);
@@ -114,25 +142,25 @@ vector<long> generate_primes_in_range(long lower, long upper) {
     return primes;
 }
 
-static vector<int> cipollamult(vector<int>& term1, vector<int>& term2, int fieldextension, int p) {
+static vector<long> cipollamult(vector<long>& term1, vector<long>& term2, long fieldextension, long p) {
     // Ensure the input vectors are of size 2
     if (term1.size() != 2 || term2.size() != 2) {
         throw std::invalid_argument("Both input vectors must be of size 2.");
     }
     
-    int a = term1[0];
-    int b = term1[1];
-    int c = term2[0];
-    int d = term2[1];
+    long a = term1[0];
+    long b = term1[1];
+    long c = term2[0];
+    long d = term2[1];
 
-    vector<int> result = {( a * c % p + (((fieldextension * b) % p) * d) % p) % p, (b * c % p + a * d % p) % p };
-    
+    //vector<long> result = {(a * c % p + (((fieldextension * b) % p) * d) % p) % p, (b * c % p + a * d % p) % p };
+    vector<long> result = {(multmodp(a, c, p) + multmodp(multmodp(fieldextension, b, p), d, p))%p, (multmodp(b, c, p) + multmodp(a, d, p))%p };
     return result;
 }
 
 //b is the power here
-static vector<int> cipolla_power_mod_p(vector<int>& term, int b, int fieldextension, int p) {
-    vector<int> result = {1, 0};
+static vector<long> cipolla_power_mod_p(vector<long>& term, long b, long fieldextension, long p) {
+    vector<long> result = {1, 0};
     while (b > 0) {
         if (b % 2 == 1) {
             //result = (result * a) % p;
@@ -147,130 +175,36 @@ static vector<int> cipolla_power_mod_p(vector<int>& term, int b, int fieldextens
     return result;
 }
 
-int squareroot(int n, int p) {
+long squareroot(long n, long p) {
     n = ((n % p)+p) % p;
-    if (power_mod_p(n, int((p-1)/2), p) != 1) {
+    if (power_mod_p(n, long((p-1)/2), p) != 1) {
         cout << "No square root exists" << endl;
         cout << "n = " << n << ", p = " << p << endl;
         return -15000000;
     }
     
     if (p % 4 == 3) {
-        int sqrt = power_mod_p(n, int((p+1)/4), p); //neat trick: this is a solution to a^2 = b
+        long sqrt = power_mod_p(n, long((p+1)/4), p); //neat trick: this is a solution to a^2 = b
         return sqrt;
     } else { //we need to apply cipolla's algo for x^2 = n mod p
         //step 1: find "a" such that a^2-n is not a square mod p
-        int a = 0;
-        int thingToEvaluate = 0;
-        for (int i = 1; i < p; i++) {
+        long a = 0;
+        long thingToEvaluate = 0;
+        for (long i = 1; i < p; i++) {
             thingToEvaluate = (((power_mod_p(i, 2, p) - n) % p) + p) % p;
-            if (power_mod_p(thingToEvaluate, int((p-1)/2), p) == p-1) { //NOT -1
+            if (power_mod_p(thingToEvaluate, long((p-1)/2), p) == p-1) { //NOT -1
                 a = i;
                 break;
             }
         }
         //step 2: compute thing in cipolla
         //we are adjoining a square root of a^2 - n, so we need to work in the field Z_p[sqrt(a^2-n)]
-        int asquaredminusn = (((a*a - n) % p) + p) % p;
-        vector<int> guyToRaisePowerTo = {a, 1};
-        vector<int> result = cipolla_power_mod_p(guyToRaisePowerTo, (p+1)/2, asquaredminusn, p);
+        long asquaredminusn = (((multmodp(a, a, p) - n) % p) + p) % p;
+        vector<long> guyToRaisePowerTo = {a, 1};
+        vector<long> result = cipolla_power_mod_p(guyToRaisePowerTo, long((p+1)/2), asquaredminusn, p);
         
         return (result[0] % p + p) % p;
     }
-}
-
-// get A and B values from CSV file
-int getAp(int p, int A, int B) {
-    int c = 0;
-    int repline = 0;
-
-    vector<int> reps = findQuarticResidueClasses(p);
-
-    string filename = "classdata/file_" + to_string(p) + ".csv";
-
-    ifstream file;
-    file.open(filename);
-    //step 1: figure out what residue class A is in
-    for (int i = 0; i <= reps.size(); i++) {
-        if (reps[i] == 0) {
-            if (A == 0) {
-                c = 0;
-                repline = i;
-                break;
-            }
-        }
-
-        if (isFourthPower((A * inverse(reps[i], p)) % p, p)) {
-            //cout << "found a fourth power - " << reps[i] << endl;
-            //cout << (A * inverse(reps[i], p)) % p << endl;
-            //cout << isFourthPower((A * inverse(reps[i], p)) % p, p) << endl;
-            c = reps[i];
-            repline = i;
-            break;
-        }
-    }
-
-    if (c == 0) {
-        int readThing = get_value_from_file(p, repline, B, file);
-
-        file.close();
-        return readThing;
-    }
-
-    int lfourth = A * inverse(c, p) % p;
-
-    //step 2: calulcate lsixth
-    int lsquare = squareroot(lfourth, p);
-    //int lsquare = 1;
-    int lsixth = lsquare * lfourth % p;
-
-    //step 3: calculate B and lookup
-    B = B * inverse(lsixth, p) % p;
-
-    int readThing = get_value_from_file(p, repline, B, file);
-
-    file.close();
-    return readThing;
-
-}
-
-
-
-
-// Function to get value from a CSV file
-int get_value_from_file(int prime, int repline, int b, ifstream &file) {
-
-    string line;
-    int target_line = prime * repline + b + 1; //+1 to account for header
-    int current_line = 0;
-    
-    file.clear();           // Clear any error flags
-    file.seekg(0, std::ios::beg); // Move the file pointer to the beginning
-
-    while (getline(file, line)) {
-        if (current_line == target_line) {
-            stringstream ss(line);
-            string item;
-            int value;
-            for (int i = 0; getline(ss, item, ','); ++i) {
-                /*if (i == 0) {
-                    cout << "rep = " << item << ", ";
-                }
-
-                if (i == 1) {
-                    cout << "b = " << item << ", ";
-                }*/
-
-                if (i == 2) {
-                    //cout << "value = " << item << "!";
-                    value = stoi(item);
-                    return value;
-                }
-            }
-        }
-        ++current_line;
-    }
-    return -1;
 }
 
 long largenummodp(vector<long>& digits, int prime) {
@@ -278,8 +212,8 @@ long largenummodp(vector<long>& digits, int prime) {
     int len = digits.size();
     for (int i=0; i < len; i++) {
         int temp = digits[i] % prime;
-        int pow10 = power_mod_p(10, 4*i, prime);
-        temp = (temp * pow10) % prime;
+        long pow10 = power_mod_p(10, 4*i, prime);
+        temp = multmodp(temp, pow10, prime);
         res = (res + temp) % prime;
     }
     return res;
