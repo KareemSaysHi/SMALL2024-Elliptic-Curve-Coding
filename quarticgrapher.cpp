@@ -3,7 +3,7 @@
 #include <vector>
 #include <cmath>
 #include <sstream>
-#include <omp.h>
+//#include <omp.h>
 #include <unordered_map>
 #include <cassert>
 #include "helperfunctions.h"
@@ -24,8 +24,8 @@ long calculatePoly(long t, long p, const vector<vector<long>>& powersOfT, const 
     long result = 0;
     int count = 0;
     for (int coeff: coeffs) {
-        result += long(coeff * powersOfT[t][count]);
-        result = long(result % p);
+        result += multmodp(coeff, powersOfT[t][count], p);
+        result = result % p;
         count++;
     }
     return long(result);
@@ -39,8 +39,6 @@ int main(int argc, char *argv[]) {
     int filterB = atoi(argv[4]); //modB
     int highestPowerA = atoi(argv[5]); // highest power of A so (length - 1) of seqA
     int highestPowerB = atoi(argv[6]); // highest power of B so (length - 1) of seqB
-    std::cout << highestPowerA << '\n';
-    std::cout << highestPowerB << '\n';
 
     // read in coeff sequences for A and B from command line
     vector<int> seqA;
@@ -55,7 +53,7 @@ int main(int argc, char *argv[]) {
         seqB.push_back(atoi(argv[i]));
     }
     
-    std::vector<long> primes = generate_primes_in_range(3, n);
+    std::vector<long> primes = generate_primes_in_range(2, n);
 
     vector<long> x; /*primes*/
     vector<float> y; /*Normalized Second Moment*/
@@ -74,7 +72,7 @@ int main(int argc, char *argv[]) {
     int highestPower = max(highestPowerA, highestPowerB);
     cout << "highestPower: " << highestPower << '\n';
 
-    #pragma omp parallel for
+    //#pragma omp parallel for
     for (int j = 0; j < primes.size(); j++) {
         long p = primes[j];
         vector<vector<long>> allPowersOfT = getPowersOfTmodP(p, highestPower + 1);
@@ -92,7 +90,8 @@ int main(int argc, char *argv[]) {
         int readThing = 0;
         int repline = 0;
 
-        if (p % 100 == 1) cout << "on prime " << p << std::endl;
+        //if (p % 100 == 1) 
+        cout << "on prime " << p << std::endl;
 
         string filename = "classdata/file_" + to_string(p) + ".csv";
 
@@ -157,7 +156,7 @@ int main(int argc, char *argv[]) {
             if (A == 0) {
                 if (p % 3 == 2 || B == 0) continue;
                 for (int i = 0; i < 6; i ++ ){
-                    if (power_mod_p((B * inverse(dataFor0Bs[i], p)) % p, (p-1)/6, p) == 1) { 
+                    if (power_mod_p(multmodp(B, inverse(dataFor0Bs[i], p), p), (p-1)/6, p) == 1) { 
                         value += pow(dataFor0Aps[i], 2);
                         break;
                     }
@@ -172,15 +171,15 @@ int main(int argc, char *argv[]) {
 
             //step 1: figure out what residue class A is in
             for (int i = 1; i <= reps.size(); i++) { // i=0 will be reps[i] = 0, which is A = 0, dealt with above
-                long lfourthmaybe = (A * inverse(reps[i], p)) % p;
+                long lfourthmaybe = multmodp(A, inverse(reps[i], p), p);
 
                 if (isFourthPower(lfourthmaybe, p)) {// at this point lfourthmaybe is a fourth power
                     //step 2: calculate lsixth
                     long lsquare = squareroot(lfourthmaybe, p);
-                    long lsixth = (lsquare * lfourthmaybe) % p;
+                    long lsixth = multmodp(lsquare, lfourthmaybe, p);
 
                     //step 3: calculate B and lookup
-                    B = (B * (inverse(lsixth, p)+p)) % p;
+                    B = multmodp(B, inverse(lsixth, p), p);
 
                     value += pow(data[p * (i-1) + B], 2);
                     break;
