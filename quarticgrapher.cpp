@@ -4,6 +4,7 @@
 #include <cmath>
 #include <sstream>
 #include <omp.h>
+#include <cstdio>
 #include <unordered_map>
 #include <cassert>
 #include "helperfunctions.h"
@@ -52,6 +53,9 @@ int main(int argc, char *argv[]) {
     for (int i = start; i <= highestPowerB + start; i++) {
         seqB.push_back(atoi(argv[i]));
     }
+
+    /*cout << power_mod_p(2, 45716, 91433) << "\n";
+    return 69;*/
     
     std::vector<long> primes = generate_primes_in_range(2, n);
 
@@ -87,57 +91,31 @@ int main(int argc, char *argv[]) {
         long B = 0;
         int c = 0;
         long long value = 0;
-        int readThing = 0;
-        int repline = 0;
 
         if (p % 100 == 1) cout << "on prime " << p << std::endl;
 
         string filename = "classdata/file_" + to_string(p) + ".csv";
 
-        long MAX_ROWS;
-        if (p % 4 == 1) MAX_ROWS = 4*p;
-        else MAX_ROWS = 2*p;
-        ifstream file(filename);
-        
-        if (!file.is_open()){
-            cerr << "Error opening file for prime " <<  p << endl;
-            continue;
-        }
-
         unordered_map<int,int> data;
         int dataFor0Bs[6];
         int dataFor0Aps[6];
-        std::string line;
+        int x1;
+        int y1;
+        int lineCountGood = 0;
 
-        int lineCount = 0;
-        while (getline(file, line)) {
-            std::stringstream ss(line);
-            string a, b;
-
-            if (lineCount < 6 && p % 3 == 1) {
-                if (getline(ss, a, ',') && getline(ss, b)) {
-                    dataFor0Bs[lineCount] = stoi(a);
-                    dataFor0Aps[lineCount] = stoi(b);
-                }
-            } else //(lineCount < 6 + MAX_ROWS) 
-            {
-                if (getline(ss, a)) {
-                    if (p % 3 == 1) {
-                        data[lineCount-6] = stoi(a);
-                    } else {
-                        data[lineCount] = stoi(a);
-                    }
-                }
-            } 
-
-            ++lineCount;
-        }
-        file.close();
-
-        // Check if file had correct number of lines
-        if (abs(lineCount - MAX_ROWS) > 7) {
-            cout << "File for prime " << p << " has " << lineCount << " lines. Expected approximately " << MAX_ROWS << ".\n";
-            continue;
+        if (FILE *fp = fopen(filename.c_str(), "r")) {
+            while (fscanf(fp, "%d,%d", &x1, &y1) == 2) {
+                dataFor0Bs[lineCountGood] = x1;
+                dataFor0Aps[lineCountGood] = y1;
+                lineCountGood ++;
+            }
+            data[0] = x1;
+            lineCountGood = 1;
+            while (fscanf(fp, "%d", &x1) == 1) {
+                data[lineCountGood] = x1;
+                lineCountGood ++ ;
+            }
+            fclose(fp);
         }
 
         vector<int> reps = findQuarticResidueClasses(p);

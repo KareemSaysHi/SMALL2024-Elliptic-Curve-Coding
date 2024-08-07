@@ -2,7 +2,7 @@
 #include <vector>
 #include <cmath>
 #include <fstream>
-#inlcude<unordered_map>
+#include <unordered_map>
 #include <string>
 
 using namespace std;

@@ -11,7 +11,7 @@ using namespace std;
 //https://www.geeksforgeeks.org/multiply-large-integers-under-large-modulo/
 //algorithm is log(max(a,b)), so don't want to run often 
 long multmodp(long a, long b, long mod) { 
-    if (a*b<=0) {//is negative if it overflows, and only want to run slow algorithm if we're in this situation
+    if (a*b<=0 || true) {//is negative if it overflows, and only want to run slow algorithm if we're in this situation
         /*long res = 0; // Initialize result 
   
         // Update a if it is more than 
@@ -35,7 +35,7 @@ long multmodp(long a, long b, long mod) {
        long long arcst = (long long) a;
        long long brcst = (long long) b;
        long long result = arcst * brcst;
-       if (result % mod < 0) return result % mod;
+       if (result % mod > 0) return result % mod;
        else return (result % mod + mod) % mod;
     }
 
@@ -53,6 +53,7 @@ long power_mod_p(long a, long b, long p) {
 
         b = b >> 1;
         a = multmodp(a, a, p);
+        //cout << a << "," << b << "," << result << "\n";
     }
     return ((result % p) + p) % p;
 }
