@@ -3,7 +3,7 @@
 #include <vector>
 #include <cmath>
 #include <sstream>
-//#include <omp.h>
+#include <omp.h>
 #include <unordered_map>
 #include <cassert>
 #include "helperfunctions.h"
