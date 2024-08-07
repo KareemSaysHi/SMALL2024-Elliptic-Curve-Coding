@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
 
         string filename = "classdata/file_" + to_string(p) + ".csv";
 
-        int MAX_ROWS;
+        long MAX_ROWS;
         if (p % 4 == 1) MAX_ROWS = 4*p;
         else MAX_ROWS = 2*p;
         ifstream file(filename);
