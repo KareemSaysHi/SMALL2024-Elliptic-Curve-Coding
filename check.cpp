@@ -5,6 +5,7 @@
 #include <sstream>
 #include <omp.h>
 #include <cassert>
+#include <unordered_map>
 #include "helperfunctions.h"
 
 using namespace std;
@@ -17,7 +18,6 @@ int main(int argc, char *argv[]) {
     std::vector<long> primes = generate_primes_in_range(lower, upper);
 
     vector<long> x; /*primes*/
-    vector<float> y; /*Normalized Second Moment*/
 
     int a = 0;
     int b = 0;
@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
     for (long p : primes) {
         string filename = "classdata/file_" + to_string(p) + ".csv";
 
-        int MAX_ROWS;
+        long MAX_ROWS;
         if (p % 4 == 1) MAX_ROWS = 4*p;
         else MAX_ROWS = 2*p;
         ifstream file(filename);
