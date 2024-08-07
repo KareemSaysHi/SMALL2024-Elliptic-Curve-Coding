@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
 
     std::string outputfilename = "dataA" + textA + "B" + textB + ".txt";
 
-    cout << "Polynomial you are running is " << "A = " + textA + ", B = " textB + '\n'; 
+    cout << "Polynomial you are running is " << "A = " + textA + ", B = " + textB + '\n'; 
 
     #pragma omp parallel for
     for (int j = 0; j < primes.size(); j++) {
