@@ -36,6 +36,9 @@ for i in range(0, len(y_new)):
     z_new.append(sumofdata/float(i+1))
     w_new.append(wsumofdata/float(weightedcount))
 
+print("Variance = "  + str(statistics.variance(y_new)))
+print("Mean = "  + str(statistics.mean(y_new)))
+
 # Plot the data
 fig, axs = plt.subplots(3)
 axs[0].plot(x_new, y_new, '.')
