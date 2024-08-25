@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
         }
 
         int MAX_ROWS = p % 4 == 1 ? 4 * p : 2 * p; // the expected number of rows
-        if (abs(lineCount - MAX_ROWS) > 2) {
+        if (abs(lineCount - MAX_ROWS) > 7) {
             cout << "File for prime " << p << " has " << lineCount << " lines. Expected approximately " << MAX_ROWS << ".\n";
             continue;
         }
@@ -155,7 +155,7 @@ int main(int argc, char *argv[]) {
             A = calculatePoly(t, p, allPowersOfT, seqA);
             B = calculatePoly(t, p, allPowersOfT, seqB);
         
-            //step 0: we need A and B to be 0<= A,B < p
+            //step 0: we need 0<= A,B < p
             A = ((A % p) + p) % p;
             B = ((B % p) + p) % p;
 
@@ -208,7 +208,7 @@ int main(int argc, char *argv[]) {
     // cout << "Finished computing second moments\n";
 
     std::ofstream output_file(outputfilename);
-    if (!output_file.is_open()) {
+    if (!output_file.is_open()) { // ideally this never runs
         cout << "Unable to open output file" << std::endl;
         //return 1;
     }
@@ -216,7 +216,7 @@ int main(int argc, char *argv[]) {
     for (size_t i = 0; i < x.size(); ++i) {
         // output_file << x[i] << "," << y[i] << "," << z[i] << "," << w[i] << std::endl;
         output_file << x[i] << "," << y[i] << std::endl; 
-        // writes p, normalized second moment of p
+        // writes p, [normalized second moment of p]
     }
 
     return 0;
