@@ -8,43 +8,17 @@
 
 using namespace std;
 
-//https://www.geeksforgeeks.org/multiply-large-integers-under-large-modulo/
-//algorithm is log(max(a,b)), so don't want to run often 
+// taken from https://www.geeksforgeeks.org/multiply-large-integers-under-large-modulo/
 long multmodp(long a, long b, long mod) { 
-    if (a*b<=0) {//is negative if it overflows, and only want to run slow algorithm if we're in this situation
-        /*long res = 0; // Initialize result 
-  
-        // Update a if it is more than 
-        // or equal to mod 
-        a %= mod; 
-  
-        while (b) { 
-            // If b is odd, add a with result 
-            if (b & 1) 
-                res = (res + a) % mod; 
-  
-            // Here we assume that doing 2*a 
-            // doesn't cause overflow 
-            a = (2 * a) % mod; 
-  
-            b >>= 1; // b = b / 2 
-        } 
-  
-        return (res+mod)%mod;
-        */
-       long long arcst = (long long) a;
-       long long brcst = (long long) b;
-       long long result = arcst * brcst;
-       if (result % mod < 0) return result % mod;
-       else return (result % mod + mod) % mod;
-    }
-
-    return a*b % mod;
+    long long arcst = (long long) a;
+    long long brcst = (long long) b;
+    long long result = arcst * brcst;
+    if (result % mod > 0) return result % mod;
+    else return (result % mod + mod) % mod;
 } 
 
 // Function to calculate a^b mod p without overflow
 long power_mod_p(long a, long b, long p) {
-    //long long a = (long long) a; //Cast a to long long data type to avoid overflow when squaring
     long result = 1;
     while (b > 0) {
         if (b % 2 == 1) {
@@ -68,7 +42,7 @@ int legendre_symbol(long x, long p) {
     }
 }
 
-//find inverse of a mod p
+// find inverse of a mod p
 long inverse(long a, long p) {
     return power_mod_p(a, p-2, p);
 }
@@ -76,25 +50,22 @@ long inverse(long a, long p) {
 // Returns true if fourth power mod p, otherwise returns false
 bool isFourthPower(long x, long p) {
     if (p % 4 == 1) {
-        if (power_mod_p(x, long((p-1)/4), p) == 1) { //1 iff x is a fourth power mod p since multiplicative group is cyclic
-            return true;
-        }
-    } else {
-        if (power_mod_p(x, long((p-1)/2), p) == 1) { //in 3 mod 4, if you're a square, you're a fourth power!
-            return true;
-        }
-    }
-    return false;
+        return power_mod_p(x, long((p-1)/4), p) == 1;
+        //1 iff x is a fourth power mod p since multiplicative group is cyclic
+    } 
+    return power_mod_p(x, long((p-1)/2), p) == 1;
+    // in 3 mod 4, if you're a square, you're a fourth power!
+    // this is a good exercise!
 }
 
 vector<int> findQuarticResidueClasses(long p) {
-    //need to make this work for p = 2, 3, maybe 5
+    // hardcode in p=2,3,5
     if (p == 2) {
         return vector<int>{0, 1};
     } else if (p == 3) {
         return vector<int>{0, 1, 2};
     } else if (p == 5) {
-        return vector<int>{0, 1, 2, 3, 4}; //all in different
+        return vector<int>{0, 1, 2, 3, 4}; 
     }
     long thingToCheck = 0;
     bool inPrevResClass = false;
@@ -122,8 +93,7 @@ vector<int> findQuarticResidueClasses(long p) {
             if (classReps.size() >= 5) { //we have 4 quartic class in 1 mod 4
                 return classReps;
             }
-        }
-        
+        }   
     }
 
     cout << "something very bad has happened if this is printed" << endl;
@@ -135,7 +105,8 @@ vector<long> generate_primes_in_range(long lower, long upper) {
     vector<long> primes;
     for (long num = 2; num < upper; num++) {
         bool is_prime = true;
-        for (long i = 2; i <= sqrt(num); i++) {
+        for (long i = 2; i <= sqrt(num); i++) { 
+            // again, this could be faster, but it works
             if (num % i == 0) {
                 is_prime = false;
                 break;
@@ -148,6 +119,7 @@ vector<long> generate_primes_in_range(long lower, long upper) {
     return primes;
 }
 
+// Cipolla's algorithm
 static vector<long> cipollamult(vector<long>& term1, vector<long>& term2, long fieldextension, long p) {
     // Ensure the input vectors are of size 2
     if (term1.size() != 2 || term2.size() != 2) {
@@ -181,6 +153,7 @@ static vector<long> cipolla_power_mod_p(vector<long>& term, long b, long fieldex
     return result;
 }
 
+// finds a square root of n mod p 
 long squareroot(long n, long p) {
     n = ((n % p)+p) % p;
     if (power_mod_p(n, long((p-1)/2), p) != 1) {
