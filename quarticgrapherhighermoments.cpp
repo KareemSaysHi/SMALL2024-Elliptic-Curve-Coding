@@ -214,11 +214,11 @@ int main(int argc, char *argv[]) {
             // the above line of code is for testing
         }
         x.push_back(p);
-        y.push_back((value - pow(p, 2)) / pow(p, 1.5)); //subtract by p^2 and divide by p^(1.5) to normalize
+        y.push_back((value2 - pow(p, 2)) / pow(p, 1.5)); //subtract by p^2 and divide by p^(1.5) to normalize
         y4.push_back(value4);   // 4th moment
-        y6.push_back(value4);   // 6th moment
-        y8.push_back(value4);   // 8th moment
-        y10.push_back(value4);  // 10th moment
+        y6.push_back(value6);   // 6th moment
+        y8.push_back(value8);   // 8th moment
+        y10.push_back(value10);  // 10th moment
     }
             
     // cout << "Finished computing second moments\n";
