@@ -176,7 +176,11 @@ int main(int argc, char *argv[]) {
                 for (int i = 0; i < 6; i ++ ){
                     if (power_mod_p(multmodp(B, inverse(dataFor0Bs[i], p), p), (p-1)/6, p) == 1) { 
                         // check if B/dataFor0Bs[i] is a 6th power
-                        value += pow(dataFor0Aps[i], 2);
+                        value2 += pow(dataFor0Aps[i], 2);
+                        value4 += pow(dataFor0Aps[i], 4);
+                        value6 += pow(dataFor0Aps[i], 6);
+                        value8 += pow(dataFor0Aps[i], 8);
+                        value10+= pow(dataFor0Aps[i],10);
                         break;
                     }
                     if (i == 5) { // hopefully you never get to this point!!
